@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diff Tool</title>
+    <style>
+        #container {
+            width: 100%;
+            height: 90vh;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs/loader.js"></script>
+</head>
+<body>
+    <h1>Diff Tool</h1>
+    <select id="language-selector">
+        <option value="javascript">JavaScript</option>
+        <option value="python">Python</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+    </select>
+    <button id="toggle-theme">Toggle Dark/Light Mode</button>
+    <div id="container"></div>
+
+    <script>
+        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.34.0/min/vs' }});
+        require(['vs/editor/editor.main'], function () {
+            // Initial configuration
+            let originalText = `function hello() { return "Hello, world!"; }`;
+            let modifiedText = `function hello() { return "Hello, Monaco Editor!"; }`;
+            let currentTheme = 'vs-dark'; // Initial theme: Dark mode
+
+            // Create the diff editor
+            const diffEditor = monaco.editor.createDiffEditor(document.getElementById('container'), {
+                theme: currentTheme,
+                language: 'javascript',
+                originalEditable: true, // Enable editing
+                automaticLayout: true
+            });
+
+            // Set the initial content for the diff editor
+            diffEditor.setModel({
+                original: monaco.editor.createModel(originalText, 'javascript'),
+                modified: monaco.editor.createModel(modifiedText, 'javascript')
+            });
+
+            // Handle language change
+            document.getElementById('language-selector').addEventListener('change', function() {
+                const language = this.value;
+                const originalModel = diffEditor.getModel().original;
+                const modifiedModel = diffEditor.getModel().modified;
+
+                // Change language of the models
+                monaco.editor.setModelLanguage(originalModel, language);
+                monaco.editor.setModelLanguage(modifiedModel, language);
+            });
+
+            // Toggle between dark and light themes
+            document.getElementById('toggle-theme').addEventListener('click', function() {
+                currentTheme = currentTheme === 'vs-dark' ? 'vs-light' : 'vs-dark';
+                monaco.editor.setTheme(currentTheme);
+            });
+        });
+    </script>
+</body>
+</html>
